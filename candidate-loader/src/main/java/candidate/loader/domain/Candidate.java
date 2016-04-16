@@ -35,6 +35,12 @@ public class Candidate {
     )
     private List<Municipality> municipalityVisited;
 
+    @Column(name = "VISIT_COUNT")
+    private int municipalitiesVisitedCount;
+
+    @Column(name = "CAMPAIGN_COVERAGE")
+    private double campaignCoverage;
+
     public String getCandidateId() {
         return candidateId;
     }
@@ -82,5 +88,21 @@ public class Candidate {
         } else {
             municipalityVisited.add(municipality);
         }
+    }
+
+    public int getMunicipalitiesVisitedCount() {
+        return municipalitiesVisitedCount;
+    }
+
+    public void setMunicipalitiesVisitedCount(int municipalitiesVisitedCount) {
+        this.municipalitiesVisitedCount = municipalitiesVisitedCount;
+    }
+
+    public double getCampaignCoverage() {
+        return campaignCoverage;
+    }
+
+    public void setCampaignCoverage(double campaignCoverage) {
+        this.campaignCoverage = campaignCoverage;
     }
 }

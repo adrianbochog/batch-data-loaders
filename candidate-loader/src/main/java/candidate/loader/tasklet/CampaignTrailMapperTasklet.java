@@ -41,6 +41,7 @@ public class CampaignTrailMapperTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting campagin trail mapping");
         List<Candidate> candidates = IteratorUtils.toList(candidateRepository.findAll().iterator());
+        List<Municipality> municipalities = IteratorUtils.toList(municipalityRepository.findAll().iterator());
         candidates.stream().forEach(c -> {
             LOGGER.info("mapping for candidate: " + c.getGivenName());
             RestTemplate restTemplate = new RestTemplate();
@@ -58,9 +59,20 @@ public class CampaignTrailMapperTasklet implements Tasklet {
                     municipalityRepository.save(municipality);
                     candidateRepository.save(c);
                 });
+
+                int campaignTrailSize = campaignTrails.size();
+                c.setMunicipalitiesVisitedCount(campaignTrailSize);
+                double percentage = 0;
+                double municialitySize = (double) municipalities.size();
+                double doubleCampaign = (double)campaignTrailSize;
+                percentage = (doubleCampaign/municialitySize)*(100.00);
+                c.setCampaignCoverage(percentage);
+                candidateRepository.save(c);
             } catch (Exception e) {
 
             }
+
+
         });
 
 
