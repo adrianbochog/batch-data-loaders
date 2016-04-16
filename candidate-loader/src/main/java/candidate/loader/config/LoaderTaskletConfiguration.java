@@ -4,14 +4,12 @@ import candidate.loader.repository.CandidateRepository;
 import candidate.loader.repository.IssueRepository;
 import candidate.loader.repository.MunicipalityRepository;
 import candidate.loader.repository.ProvinceRepository;
-import candidate.loader.tasklet.IssueLoaderTasklet;
-import candidate.loader.tasklet.LoaderTasklet;
-import candidate.loader.tasklet.MunicipalityLoaderTasklet;
-import candidate.loader.tasklet.ProvinceLoaderTasklet;
+import candidate.loader.tasklet.*;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.config.Task;
 
 /**
  * Created by Adrian Perez on 4/16/16.
@@ -48,4 +46,10 @@ public class LoaderTaskletConfiguration {
     public Tasklet municipalityLoaderTasklet(){
         return new MunicipalityLoaderTasklet(municipalityRepository,provinceRepository);
     }
+
+    @Bean
+    public Tasklet campaignTrailMapperTasklet(){
+        return new CampaignTrailMapperTasklet(candidateRepository,municipalityRepository);
+    }
+
 }

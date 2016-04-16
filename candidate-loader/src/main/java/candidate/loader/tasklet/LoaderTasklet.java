@@ -42,11 +42,6 @@ public class LoaderTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Candidate Loader Tasklet Init..");
         RestTemplate restTemplate = new RestTemplate();
-        List<MediaType> acceptedMediaTypes = new ArrayList<>();
-        acceptedMediaTypes.add(MediaType.APPLICATION_JSON);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.setAccept(acceptedMediaTypes);
         String candidateString = restTemplate.getForObject(url, String.class);
 
         ObjectMapper mapper = new ObjectMapper();

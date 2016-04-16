@@ -1,9 +1,7 @@
 package candidate.loader.tasklet;
 
-import candidate.loader.domain.Candidate;
 import candidate.loader.domain.Issue;
 import candidate.loader.repository.IssueRepository;
-import candidate.loader.web.json.CandidateJson;
 import candidate.loader.web.json.IssueJson;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,11 +10,8 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,8 +33,6 @@ public class IssueLoaderTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         LOGGER.info("Issue Loader Tasklet Init..");
-
-
         RestTemplate restTemplate = new RestTemplate();
         String candidateString = restTemplate.getForObject(url, String.class);
 

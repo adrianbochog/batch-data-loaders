@@ -1,6 +1,9 @@
 package candidate.loader.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Adrian Perez on 4/16/16.
@@ -18,6 +21,9 @@ public class Municipality {
     @ManyToOne
     @JoinColumn(name = "PROVINCE_ID")
     private Province province;
+
+    @ManyToMany(mappedBy = "municipalityVisited")
+    private List<Candidate> visitors;
 
     public String getMunicipalityId() {
         return municipalityId;
@@ -41,5 +47,22 @@ public class Municipality {
 
     public void setProvince(Province province) {
         this.province = province;
+    }
+
+    public List<Candidate> getVisitors() {
+        return visitors;
+    }
+
+    public void setVisitors(List<Candidate> visitors) {
+        this.visitors = visitors;
+    }
+
+    public void addVisitor(Candidate candidate){
+        if(visitors == null){
+            visitors = new ArrayList<>();
+            visitors.add(candidate);
+        } else {
+            visitors.add(candidate);
+        }
     }
 }

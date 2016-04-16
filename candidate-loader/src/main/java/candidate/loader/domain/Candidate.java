@@ -1,9 +1,9 @@
 package candidate.loader.domain;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Adrian Perez on 4/16/16.
@@ -23,6 +23,17 @@ public class Candidate {
 
     @Column(name = "POSITION")
     private String position;
+
+    @ManyToMany
+    @JoinTable(
+            joinColumns = {
+                    @JoinColumn(name = "CANDIDATE_ID",referencedColumnName = "CANDIDATE_ID")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "MUNICIPALITY_ID",referencedColumnName = "MUNICIPALITY_ID")
+            }
+    )
+    private List<Municipality> municipalityVisited;
 
     public String getCandidateId() {
         return candidateId;
@@ -54,5 +65,22 @@ public class Candidate {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public List<Municipality> getMunicipalityVisited() {
+        return municipalityVisited;
+    }
+
+    public void setMunicipalityVisited(List<Municipality> municipalityVisited) {
+        this.municipalityVisited = municipalityVisited;
+    }
+
+    public void addMunicipality(Municipality municipality){
+        if(municipalityVisited == null){
+            municipalityVisited = new ArrayList<>();
+            municipalityVisited.add(municipality);
+        } else {
+            municipalityVisited.add(municipality);
+        }
     }
 }

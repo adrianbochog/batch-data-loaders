@@ -51,14 +51,18 @@ public class BatchConfiguration {
     @Autowired
     public Tasklet municipalityLoaderTasklet;
 
+    @Autowired
+    public Tasklet campaignTrailMapperTasklet;
+
     @Bean
     public Job importUserJob() {
         return jobBuilderFactory.get("loadDataJob")
                 .incrementer(new RunIdIncrementer())
-                .flow(candidatesLoaderStep())
-                .next(issueLoaderStep())
+                .flow(issueLoaderStep())
                 .next(provinceLoaderStep())
                 .next(municipalityLoaderStep())
+                .next(candidatesLoaderStep())
+                .next(campaignTrailMapperStep())
                 .end()
                 .build();
     }
@@ -88,6 +92,13 @@ public class BatchConfiguration {
     public Step issueLoaderStep() {
         return stepBuilderFactory.get("issueLoaderStep")
                 .tasklet(issueLoaderTasklet)
+                .build();
+    }
+
+    @Bean
+    public Step campaignTrailMapperStep(){
+        return stepBuilderFactory.get("campaignTrailMapperStep")
+                .tasklet(campaignTrailMapperTasklet)
                 .build();
     }
     // end::jobstep[]
