@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.nio.file.Path;
@@ -24,6 +26,8 @@ import java.nio.file.Paths;
 
 @Configuration
 @EnableBatchProcessing
+@EnableTransactionManagement
+@Transactional
 public class BatchConfiguration {
 
     @Autowired
@@ -38,19 +42,52 @@ public class BatchConfiguration {
     @Autowired
     public Tasklet loaderTasklet;
 
+    @Autowired
+    public Tasklet issueLoaderTasklet;
+
+    @Autowired
+    public Tasklet provinceLoaderTasklet;
+
+    @Autowired
+    public Tasklet municipalityLoaderTasklet;
+
     @Bean
     public Job importUserJob() {
-        return jobBuilderFactory.get("importUserJob")
+        return jobBuilderFactory.get("loadDataJob")
                 .incrementer(new RunIdIncrementer())
-                .flow(step1())
+                .flow(candidatesLoaderStep())
+                .next(issueLoaderStep())
+                .next(provinceLoaderStep())
+                .next(municipalityLoaderStep())
                 .end()
                 .build();
     }
 
     @Bean
-    public Step step1() {
-        return stepBuilderFactory.get("step1")
+    public Step provinceLoaderStep() {
+        return stepBuilderFactory.get("provinceLoaderStep")
+                .tasklet(provinceLoaderTasklet)
+                .build();
+    }
+
+    @Bean
+    public Step municipalityLoaderStep() {
+        return stepBuilderFactory.get("municipalityLoaderStep")
+                .tasklet(municipalityLoaderTasklet)
+                .build();
+    }
+
+    @Bean
+    public Step candidatesLoaderStep() {
+        return stepBuilderFactory.get("candidatesLoaderStep")
                 .tasklet(loaderTasklet)
+                .build();
+    }
+
+    @Bean
+    public Step issueLoaderStep() {
+        return stepBuilderFactory.get("issueLoaderStep")
+                .tasklet(issueLoaderTasklet)
                 .build();
     }
     // end::jobstep[]

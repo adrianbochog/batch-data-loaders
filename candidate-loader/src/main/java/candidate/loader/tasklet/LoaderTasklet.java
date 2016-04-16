@@ -3,12 +3,15 @@ package candidate.loader.tasklet;
 import candidate.loader.domain.Candidate;
 import candidate.loader.repository.CandidateRepository;
 import candidate.loader.web.json.CandidateJson;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -31,51 +34,41 @@ public class LoaderTasklet implements Tasklet {
 
     private CandidateRepository candidateRepository;
 
-    public LoaderTasklet(CandidateRepository candidateRepository){
+    public LoaderTasklet(CandidateRepository candidateRepository) {
         this.candidateRepository = candidateRepository;
     }
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        LOGGER.info("Tasklet Ran Successfuly");
-        /*
-        Candidate candidate = new Candidate();
-        candidate.setCandidateId("1");
-        candidate.setGivenName("Orvyl");
-        candidate.setLastName("Tumaneng");
-        candidate.setPosition(Candidate.Position.PRESIDENT);
-        candidateRepository.save(candidate);
-        */
-
+        LOGGER.info("Candidate Loader Tasklet Init..");
         RestTemplate restTemplate = new RestTemplate();
-//        //restTemplate.exchange("http://my-rest-url.org/rest/account/{account}?name={name}", HttpMethod.GET, httpEntity, clazz, "my-account", "my-name")
-//        restTemplate.exchange("http://api.bilangpilipino.com/api-bilang-pilipino/api/candidates/{year}?key={key}&token={token}",
-//                HttpMethod.GET,
-//                CandidateJson.class,
-//                year,
-//                key,
-//                token);
         List<MediaType> acceptedMediaTypes = new ArrayList<>();
         acceptedMediaTypes.add(MediaType.APPLICATION_JSON);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.setAccept(acceptedMediaTypes);
-//        ResponseEntity<CandidateJson[]> responseEntity = restTemplate.exchange(
-//                url,
-//                HttpMethod.GET,
-//                new HttpEntity<>(httpHeaders),
-//                CandidateJson[].class);
-        CandidateJson[] candidates = restTemplate.getForObject(url,CandidateJson[].class);
-        //CandidateJson[] candidates = responseEntity.getBody();
-        int count = 0;
-        while (count < 0 ){
-            LOGGER.info(candidates[count].getCandidateName());
-            count++;
-        }
-//        CandidateJson candidateJson = restTemplate.getForObject(url, CandidateJson.class);
-//        LOGGER.info(candidateJson);
+        String candidateString = restTemplate.getForObject(url, String.class);
 
-        LOGGER.info("GET call Success");
+        ObjectMapper mapper = new ObjectMapper();
+        List<CandidateJson> candidates = mapper.readValue(candidateString,
+                new TypeReference<List<CandidateJson>>() {
+                });
+
+        candidates.stream().filter(c -> {
+            if (c.getPosition().equals("President") || c.getPosition().equals("Vice President")) {
+                return true;
+            } else {
+                return false;
+            }
+        }).forEach(c -> {
+
+            Candidate candidate = new Candidate();
+            candidate.setCandidateId(c.getCandidateId());
+            candidate.setGivenName(c.getCandidateName());
+            candidate.setPosition(c.getPosition());
+
+            candidateRepository.save(candidate);
+        });
         return RepeatStatus.FINISHED;
     }
 }
