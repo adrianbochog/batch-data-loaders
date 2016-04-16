@@ -8,8 +8,11 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Adrian Perez on 4/16/16.
@@ -52,8 +55,25 @@ public class LoaderTasklet implements Tasklet {
 //                year,
 //                key,
 //                token);
-        CandidateJson candidateJson = restTemplate.getForObject(url, CandidateJson.class);
-        LOGGER.info(candidateJson);
+        List<MediaType> acceptedMediaTypes = new ArrayList<>();
+        acceptedMediaTypes.add(MediaType.APPLICATION_JSON);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.setAccept(acceptedMediaTypes);
+//        ResponseEntity<CandidateJson[]> responseEntity = restTemplate.exchange(
+//                url,
+//                HttpMethod.GET,
+//                new HttpEntity<>(httpHeaders),
+//                CandidateJson[].class);
+        CandidateJson[] candidates = restTemplate.getForObject(url,CandidateJson[].class);
+        //CandidateJson[] candidates = responseEntity.getBody();
+        int count = 0;
+        while (count < 0 ){
+            LOGGER.info(candidates[count].getCandidateName());
+            count++;
+        }
+//        CandidateJson candidateJson = restTemplate.getForObject(url, CandidateJson.class);
+//        LOGGER.info(candidateJson);
 
         LOGGER.info("GET call Success");
         return RepeatStatus.FINISHED;

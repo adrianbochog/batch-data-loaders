@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by Adrian Perez on 4/16/16.
  */
-public class CandidateJson implements Serializable {
+public class CandidateJson implements Serializable  {
 
     @JsonProperty("can_id")
     private String candidateId;
