@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>chooseday</groupId>
-    <artifactId>generic-csv-parsers</artifactId>
+    <artifactId>batch-data-loaders</artifactId>
     <packaging>pom</packaging>
     <version>0.1.0</version>
     <modules>
